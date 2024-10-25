@@ -1,11 +1,11 @@
-from flask import Flask, request, render_template, jsonify
+from flask import Flask, request, jsonify, render_template
 import requests
 
 app = Flask(__name__)
 
 # Configuration: Replace with actual Gemini API endpoint and API key
 GEMINI_API_URL = "https://api.gemini.com/v1/aura"  # Hypothetical endpoint
-GEMINI_API_KEY = "your_gemini_api_key_here"  # API key if authentication is required
+GEMINI_API_KEY = "your_gemini_api_key_here"  # Replace with actual API key
 
 @app.route('/')
 def home():
@@ -13,7 +13,7 @@ def home():
 
 @app.route('/calculate_aura', methods=['POST'])
 def calculate_aura():
-    scenario = request.form.get('scenario')
+    scenario = request.json.get('scenario')
 
     if not scenario:
         return jsonify({"error": "No scenario provided"}), 400
@@ -27,18 +27,18 @@ def calculate_aura():
         "scenario": scenario
     }
 
-    # Make the request to Gemini API
+    # Make the request to the Gemini API
     try:
         response = requests.post(GEMINI_API_URL, headers=headers, json=data)
         response.raise_for_status()
         aura_data = response.json()
 
-        # Extract aura result from response
+        # Extract aura result from the response
         aura = aura_data.get("aura")
         if not aura:
             return jsonify({"error": "Failed to calculate aura"}), 500
 
-        return render_template('result.html', aura=aura, scenario=scenario)
+        return jsonify({"aura": aura})
     except requests.exceptions.RequestException as e:
         return jsonify({"error": str(e)}), 500
 
