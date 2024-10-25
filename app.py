@@ -1,49 +1,48 @@
-from flask import Flask, request, jsonify, render_template
-import requests
+from flask import Flask, render_template, request
+import google.generativeai as genai
 
-app = Flask(__name__)
+# Initialize the Flask application
+app = Flask("AuraCalculator1")
 
-# Updated Gemini API configuration
-GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta2/models/gemini-1.5-flash:generateText"
-GEMINI_API_KEY = "AIzaSyCKXQyrywDc4J9jacv4q1cGkhWkAV0-KpI"  # Replace with actual API key
+# Configure the Gemini API with your API key
+genai.configure(api_key="AIzaSyCKXQyrywDc4J9jacv4q1cGkhWkAV0-KpI")
+model = genai.GenerativeModel("gemini-1.5-flash")
 
-@app.route('/')
-def home():
-    return render_template('index.html')
-
-@app.route('/calculate_aura', methods=['POST'])
-def calculate_aura():
-    scenario = request.json.get('scenario')
-
-    if not scenario:
-        return jsonify({"error": "No scenario provided"}), 400
-
-    # Prepare the API call to Gemini
-    headers = {
-        "Content-Type": "application/json"
-    }
-    data = {
-        "prompt": {
-            "text": scenario
-        }
-    }
-
-    # Make the request to the Gemini API
+# Function to calculate aura based on the user's scenario input
+def calculate_aura(scenario):
     try:
-        # Note: The key parameter is correctly appended to the URL
-        response = requests.post(f"{GEMINI_API_URL}?key={GEMINI_API_KEY}", headers=headers, json=data)
-        response.raise_for_status()
-        aura_data = response.json()
+        # Construct a query to generate an aura score
+        query = f"Provide an aura score from -10000 to 10000 based on this scenario: {scenario}"
+        
+        # Generate content using the Gemini model
+        response = model.generate_content(query)
+        
+        # Extract the text output
+        aura_score_text = response.text
+        
+        # Parse the output into an integer if possible, defaulting to 0 on error
+        try:
+            aura_score = int(aura_score_text)
+        except ValueError:
+            aura_score = 0  # Handle unexpected non-numeric responses
 
-        # Extract aura result from the response
-        # Assume response contains "candidates" with "output" or "content" field
-        aura = aura_data.get("candidates", [{}])[0].get("output")  # Adjust based on actual structure
-        if not aura:
-            return jsonify({"error": "Failed to calculate aura"}), 500
+        return aura_score
+    except Exception as e:
+        return f"An error occurred: {str(e)}"
 
-        return jsonify({"aura": aura})
-    except requests.exceptions.RequestException as e:
-        return jsonify({"error": str(e)}), 500
+@app.route("/", methods=["GET", "POST"])
+def index():
+    if request.method == "POST":
+        # Retrieve the scenario input from the form
+        scenario = request.form.get("scenario")
+        if scenario:
+            # Calculate the aura score based on the scenario
+            aura_score = calculate_aura(scenario)
+            return render_template("index.html", aura_score=aura_score)
+        else:
+            return render_template("index.html", error="Please enter a valid scenario.")
+    return render_template("index.html")
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run(debug=True)
+v
