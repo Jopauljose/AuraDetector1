@@ -4,13 +4,47 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aura Detector</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; }
+        h1 { color: #4A90E2; }
+        #result { margin-top: 20px; font-size: 1.2em; color: #333; }
+        .error { color: red; }
+    </style>
 </head>
 <body>
     <h1>Aura Detector</h1>
-    <form action="/calculate_aura" method="POST">
-        <label for="scenario">Enter a Scenario:</label>
-        <textarea id="scenario" name="scenario" rows="4" cols="50" required></textarea>
-        <button type="submit">Calculate Aura</button>
-    </form>
+    <label for="scenario">Enter a Scenario:</label>
+    <textarea id="scenario" name="scenario" rows="4" cols="50" required></textarea>
+    <button onclick="calculateAura()">Calculate Aura</button>
+    
+    <div id="result"></div>
+
+    <script>
+        async function calculateAura() {
+            const scenario = document.getElementById('scenario').value;
+            const resultDiv = document.getElementById('result');
+            resultDiv.textContent = "Calculating...";
+
+            try {
+                const response = await fetch('/calculate_aura', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ scenario: scenario })
+                });
+
+                const data = await response.json();
+
+                if (data.error) {
+                    resultDiv.innerHTML = `<span class="error">Error: ${data.error}</span>`;
+                } else {
+                    resultDiv.innerHTML = `<strong>Aura:</strong> ${data.aura}`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<span class="error">Failed to connect to the server.</span>`;
+            }
+        }
+    </script>
 </body>
 </html>
