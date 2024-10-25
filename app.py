@@ -4,7 +4,7 @@ import requests
 app = Flask(__name__)
 
 # Gemini API configuration
-GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent"
+GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta2/models/gemini-1.5-flash:generateText"
 GEMINI_API_KEY = "AIzaSyCKXQyrywDc4J9jacv4q1cGkhWkAV0-KpI"  # Replace with actual API key
 
 @app.route('/')
@@ -23,23 +23,20 @@ def calculate_aura():
         "Content-Type": "application/json"
     }
     data = {
-        "contents": [
-            {
-                "parts": [
-                    {"text": scenario}
-                ]
-            }
-        ]
+        "prompt": {
+            "text": scenario
+        }
     }
 
     # Make the request to the Gemini API
     try:
-        response = requests.post(f"{https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent}?key={AIzaSyCKXQyrywDc4J9jacv4q1cGkhWkAV0-KpI}", headers=headers, json=data)
+        response = requests.post(f"{GEMINI_API_URL}?key={GEMINI_API_KEY}", headers=headers, json=data)
         response.raise_for_status()
         aura_data = response.json()
 
-        # Extract aura result from the response (assuming 'aura' is in the response)
-        aura = aura_data.get("aura")  # Adjust according to actual response structure
+        # Extract aura result from the response
+        # Assuming the response structure contains "candidates" and "content"
+        aura = aura_data.get("candidates", [{}])[0].get("output")
         if not aura:
             return jsonify({"error": "Failed to calculate aura"}), 500
 
