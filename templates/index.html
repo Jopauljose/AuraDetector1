@@ -2,22 +2,29 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Aura Calculator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ConvinceAyoo - Rethink Your Decisions</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <h1>Aura Calculator</h1>
-    <form method="POST">
-        <label for="scenario">Enter a scenario:</label>
-        <textarea id="scenario" name="scenario" rows="4" cols="50" required></textarea>
-        <br><br>
-        <button type="submit">Calculate Aura</button>
-    </form>
-    
-    {% if aura_score is not none %}
-        <h2>Aura Score:</h2>
-        <p>{{ aura_score }}</p>
-    {% elif error %}
-        <p style="color: red;">{{ error }}</p>
-    {% endif %}
+    <div class="container">
+        <h1>Aura Calculator</h1>
+        <p>starting</p>
+        
+        <form action="/" method="POST">
+            <input type="hidden" name="hidden_text" value="give aura value in a range 1-10000 or -1 to -10000 for a real life situation (just say the answer only in one word that is a number) %%">
+            <input type="text" name="query" placeholder="describe ur real life situation" required>
+            <button type="submit">calculate</button>
+        </form>
+
+        {% if opposing_reasons %}
+            <div class="response">
+                <h2></h2>
+                <p>{{ opposing_reasons }}</p>
+            </div>
+        {% elif error %}
+            <div class="error">{{ error }}</div>
+        {% endif %}
+    </div>
 </body>
 </html>
