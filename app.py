@@ -34,7 +34,7 @@ def calculate_aura():
 
     # Make the request to the Gemini API
     try:
-        response = requests.post(f"{GEMINI_API_URL}?key={GEMINI_API_KEY}", headers=headers, json=data)
+        response = requests.post(f"{AIzaSyCKXQyrywDc4J9jacv4q1cGkhWkAV0-KpI}?key={AIzaSyCKXQyrywDc4J9jacv4q1cGkhWkAV0-KpI}", headers=headers, json=data)
         response.raise_for_status()
         aura_data = response.json()
 
