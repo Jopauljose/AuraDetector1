@@ -2,49 +2,22 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aura Detector</title>
-    <style>
-        body { font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; }
-        h1 { color: #4A90E2; }
-        #result { margin-top: 20px; font-size: 1.2em; color: #333; }
-        .error { color: red; }
-    </style>
+    <title>Aura Calculator</title>
 </head>
 <body>
-    <h1>Aura Detector</h1>
-    <label for="scenario">Enter a Scenario:</label>
-    <textarea id="scenario" name="scenario" rows="4" cols="50" required></textarea>
-    <button onclick="calculateAura()">Calculate Aura</button>
+    <h1>Aura Calculator</h1>
+    <form method="POST">
+        <label for="scenario">Enter a scenario:</label>
+        <textarea id="scenario" name="scenario" rows="4" cols="50" required></textarea>
+        <br><br>
+        <button type="submit">Calculate Aura</button>
+    </form>
     
-    <div id="result"></div>
-
-    <script>
-        async function calculateAura() {
-            const scenario = document.getElementById('scenario').value;
-            const resultDiv = document.getElementById('result');
-            resultDiv.textContent = "Calculating...";
-
-            try {
-                const response = await fetch('/calculate_aura', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ scenario: scenario })
-                });
-
-                const data = await response.json();
-
-                if (data.error) {
-                    resultDiv.innerHTML = `<span class="error">Error: ${data.error}</span>`;
-                } else {
-                    resultDiv.innerHTML = `<strong>Aura:</strong> ${data.aura}`;
-                }
-            } catch (error) {
-                resultDiv.innerHTML = `<span class="error">Failed to connect to the server.</span>`;
-            }
-        }
-    </script>
+    {% if aura_score is not none %}
+        <h2>Aura Score:</h2>
+        <p>{{ aura_score }}</p>
+    {% elif error %}
+        <p style="color: red;">{{ error }}</p>
+    {% endif %}
 </body>
 </html>
