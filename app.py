@@ -13,10 +13,12 @@ def get_opposing_reasons(user_query):
     try:
         # Construct the full query with the specified phrase
         full_query = f"give aura value in a range 1-10000 or -1 to -10000 for a real life situation (just say the answer only in one word that is a number) %% {user_query}"
-        
+        half_query = f"roast the situation with the given details only and dont ask me details %% {user_query}  "
         # Generate content using the Gemini model
         response = model.generate_content(full_query)
-        return response.text  # Return the generated response text
+        responseone = model.generate_content(half_query)
+        return response.text,responseone.text
+        # Return the generated response text
     except Exception as e:
         return f"An error occurred: {str(e)}"
 
